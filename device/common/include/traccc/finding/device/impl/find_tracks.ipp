@@ -312,10 +312,14 @@ TRACCC_HOST_DEVICE inline void find_tracks(
                 payload.step == 0 ? 0 : links.at(prev_link_idx).n_skipped;
 
             if (n_skipped >= cfg.max_num_skipping_per_cand) {
-                // In case of max skipping being 0 and first step being skipped,
-                // the links are empty, and the tip has nowhere to point
-                assert(payload.step > 0);
-                tips.push_back(prev_link_idx);
+                const unsigned int n_cands = payload.step - n_skipped;
+                if (n_cands >= cfg.min_track_candidates_per_track) {
+                    // In case of max skipping and min length being 0, and first
+                    // step being skipped, the links are empty, and the tip has
+                    // nowhere to point
+                    assert(payload.step > 0);
+                    tips.push_back(prev_link_idx);
+                }
             } else {
                 // Add measurement candidates to link
                 const unsigned int l_pos = links.bulk_append_implicit(1);
